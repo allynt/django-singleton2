@@ -1,0 +1,42 @@
+{% load static %}
+
+<html>
+
+<head>
+  <title>Django-Singleton2</title>
+  <style>
+    body {
+      padding: 2em;
+      margin: 2em;
+    }
+
+    .header {
+      border-bottom: 1px solid #999;
+      font-weight: bold;
+    }
+
+    .footer {
+      border-top: 1px solid #999;
+      font-style: italic;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    Behold Django-Singleton2!
+  </div>
+  <div>
+    <p>
+      This is an example project demonstrating how I write a Django Reusable App.
+    </p>
+    <p>
+      Here are some useful links:
+    <ul>
+      <li><a href="{% url 'admin:index' %}">{% url 'admin:index' %}</a></li>
+    </ul>
+    </p>
+  </div>
+</body>
+
+</html>
