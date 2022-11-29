@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to Django Singleton2's documentation!
-============================================
+=============================================
 
 .. note::
   You probably don't care about **The App**.  You probably want to skip to **The Process**.
