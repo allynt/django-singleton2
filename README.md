@@ -39,11 +39,12 @@
   - [package](#package)
   - [publish](#publish)
 
-<div class="well">
+```{note}
 This is a silly little Django Reusable App which can be used purely as a guide for writing *other* Django Resuable Apps.
 
 Feel free to use the actual code - *it is useful* - but mostly this repository exists to document the process of professionaly creating a Django Reusable App.  I use the word "professionaly" to distinguish it from just writing Python code that does clever stuff in Django.  This repository also includes automated documentation, testing, and publishing.  All the stuff that all those other "professional" apps have but which don't ever seem to be documented anywhere.
-</div>
+```
+
 
 ## The app
 
@@ -51,19 +52,13 @@ A singleton is a class that can only be instanciated a single time.  `SingletonM
 
 ### Installation
 
-Install with pip.
+Install with pip or your favorite Python package manager.
 
 ```
 pip install django-singleton2
 ```
 
-_or_
-
-```
-pip install -i https://test.pypi.org/simple/ django-singleton2
-```
-
-Add _singleton2_ to your _INSTALLED_APPS_
+Add "singleton2" to your `INSTALLED_APPS`
 
 ```
 INSTALLED_APPS = [
@@ -99,7 +94,7 @@ Validation errors will ocurr if you try to save more than one instance of a sing
 If you try to save more than one instance of a singleton outside of a form then nothing will happen, unless `SINGLETON_RAISE_ERROR_ON_SAVE` is set to True in which case an exception will be raised.
 
 
-> **Note** that the app is called "django-singleton2" because there is an existing [django-singleton](https://github.com/defbyte/django-singleton) app which works perfectly well.  
+> **Note** that the app is called "django-singleton2" because there is an existing [django-singleton](https://github.com/defbyte/django-singleton) app which does the same thing and works perfectly well.  
 
 -----
 
@@ -111,20 +106,24 @@ I do all of my coding on Ubuntu because I'm not insane.
 
 ### project structure (part 1)
 
-First create the repository in GiHub.  In theory this can be done from the command line using (gh)[https://cli.github.com/], but honestly, I find using the GitHub website a lot more straightforward.  Plus doing it this way can automatically create the README.md, LICENSE, and .gitignore files.  
+First create the repository in GiHub.  In theory this can be done from the command line using [gh]([https://cli.github.com/), but honestly, I find using the GitHub website GUI a lot more straightforward.  Plus doing it this way can automatically create the README.md, LICENCE, and .gitignore files for you.  
 
 Once that has been done, clone the repository into your local filesystem and then setup the basic directory structure:
 
-`git clone git@github.com:allynt/django-singleton2.git django-singleton`
-`mkdir -p django-singleton/singleton`
-`mkdir -p django-singleton/example-project`
-`mkdir -p django-singleton/docs`
-`mkdir -p django-singleton/.github`
-`cd django-singleton/`
+```
+git clone git@github.com:allynt/django-singleton2.git django-singleton
+mkdir -p django-singleton/singleton
+mkdir -p django-singleton/example-project
+mkdir -p django-singleton/docs
+mkdir -p django-singleton/.github
+cd django-singleton/
+```
 
 This provides us with a place to store the app, a project to develop against, documentation, and workflows for CI.
 
 Since you're using github, now would be as good a time as any to create some templates to help potential collaborators.  I AM HERE
+
+I also created a CODE_OF_CONDUCT.md file (as per [here](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/adding-a-code-of-conduct-to-your-project)) and a CONTRIBUTING.md file (as per [here](https://github.com/nayafia/contributing-template))
 
 Now that that's all out of the way run
 
