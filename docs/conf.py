@@ -16,6 +16,7 @@ import django
 
 import sphinx_rtd_theme
 
+sys.path.insert(0, os.path.abspath(".."))
 sys.path.insert(0, os.path.abspath("../singleton2"))
 sys.path.insert(0, os.path.abspath("../example-project"))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
@@ -41,6 +42,7 @@ extensions = [
     "sphinx_rtd_theme",
 ]
 myst_all_links_external = True
+myst_heading_anchors = 4
 todo_include_todos = True
 
 pygments_style = "sphinx"

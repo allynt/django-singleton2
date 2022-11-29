@@ -1,6 +1,8 @@
  
 <!-- # django-singleton -->
 
+[![Documentation Status](https://readthedocs.org/projects/django-singleton2/badge/?version=latest)](https://django-singleton2.readthedocs.io/en/latest/?badge=latest)
+
 - [The app](#the-app)
   - [Installation](#installation)
   - [Configuration](#configuration)
@@ -8,7 +10,7 @@
 - [The process of creating the app](#the-process-of-creating-the-app)
   - [project structure (part 1)](#project-structure-part-1)
   - [setup a sensible environment (part 1)](#setup-a-sensible-environment-part-1)
-  - [pyenv](#pyenv)
+    - [pyenv](#pyenv)
     - [poetry](#poetry)
     - [tox](#tox)
     - [pytest](#pytest)
@@ -18,39 +20,34 @@
     - [bootstrapping the app](#bootstrapping-the-app)
     - [boostrapping the project to develop against](#boostrapping-the-project-to-develop-against)
     - [bootstrapping the documentation](#bootstrapping-the-documentation)
-  - [setup a sensible environment (part 2)](#setup-a-sensible-environment-part-2)
-  - [coding](#coding)
-    - [connect the app to the example-project](#connect-the-app-to-the-example-project)
-    - [testing](#testing)
-    - [documenting](#documenting)
-    - [versioning](#versioning)
-    - [packaging](#packaging)
-    - [publishing](#publishing)
-    - [continuous integration (workflows)](#continuous-integration-workflows)
-- [I AM HERE](#i-am-here)
-    - [documentation](#documentation)
-    - [read the docs](#read-the-docs)
-  - [testing](#testing-1)
-    - [pytest](#pytest-1)
-    - [tox](#tox-1)
-    - [github actions](#github-actions)
-  - [documentation](#documentation-1)
-  - [versioning](#versioning-1)
-  - [package](#package)
-  - [publish](#publish)
+    - [setup a sensible environment (part 2)](#setup-a-sensible-environment-part-2)
+    - [coding](#coding)
+      - [connect the app to the example-project](#connect-the-app-to-the-example-project)
+      - [testing](#testing)
+      - [documenting](#documenting)
+      - [versioning](#versioning)
+      - [packaging](#packaging)
+      - [publishing](#publishing)
+      - [continuous integration (workflows)](#continuous-integration-workflows)
+  - [I AM HERE](#i-am-here)
+      - [documentation](#documentation)
+      - [read the docs](#read-the-docs)
+    - [testing](#testing-1)
+      - [pytest](#pytest-1)
+      - [tox](#tox-1)
+      - [github actions](#github-actions)
+    - [documentation](#documentation-1)
+    - [versioning](#versioning-1)
+    - [package](#package)
+    - [publish](#publish)
 
-```{note}
-This is a silly little Django Reusable App which can be used purely as a guide for writing *other* Django Resuable Apps.
+-----
 
-Feel free to use the actual code - *it is useful* - but mostly this repository exists to document the process of professionaly creating a Django Reusable App.  I use the word "professionaly" to distinguish it from just writing Python code that does clever stuff in Django.  This repository also includes automated documentation, testing, and publishing.  All the stuff that all those other "professional" apps have but which don't ever seem to be documented anywhere.
-```
-
-
-## The app
+# The app
 
 A singleton is a class that can only be instanciated a single time.  `SingletonMixin` turns any Django Model into a singleton.  
 
-### Installation
+## Installation
 
 Install with pip or your favorite Python package manager.
 
@@ -67,7 +64,7 @@ INSTALLED_APPS = [
 ]
 ```
 
-### Configuration
+## Configuration
 
 Update _settings.py_ if you feel like it:
 
@@ -77,7 +74,7 @@ SINGLETON_RAISE_ERROR_ON_SAVE = True|False
 
 The default value is False.
 
-### Usage
+## Usage
 
 ```
 from django.db import models
@@ -98,15 +95,15 @@ If you try to save more than one instance of a singleton outside of a form then 
 
 -----
 
-## The process of creating the app
+# The process of creating the app
 
 All the stuff that other people seem to already know is described here.
 
 I do all of my coding on Ubuntu because I'm not insane.  
 
-### project structure (part 1)
+## project structure (part 1)
 
-First create the repository in GiHub.  In theory this can be done from the command line using [gh]([https://cli.github.com/), but honestly, I find using the GitHub website GUI a lot more straightforward.  Plus doing it this way can automatically create the README.md, LICENCE, and .gitignore files for you.  
+First create the repository in GiHub.  In theory this can be done from the command line using [gh]([https://cli.github.com/), but honestly, I find using the GitHub website GUI a lot more straightforward.  Plus doing it this way can automatically create the "README.md", "LICENCE", and ".gitignore" files for you.  
 
 Once that has been done, clone the repository into your local filesystem and then setup the basic directory structure:
 
@@ -121,29 +118,40 @@ cd django-singleton/
 
 This provides us with a place to store the app, a project to develop against, documentation, and workflows for CI.
 
-Since you're using github, now would be as good a time as any to create some templates to help potential collaborators.  I AM HERE
-
-I also created a CODE_OF_CONDUCT.md file (as per [here](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/adding-a-code-of-conduct-to-your-project)) and a CONTRIBUTING.md file (as per [here](https://github.com/nayafia/contributing-template))
-
 Now that that's all out of the way run
 
-`git add .`
-`git commit -m "initial commit"`
-`git push`
+```
+git add .
+git commit -m "initial commit"
+git push
+```
 
 to make sure that github and your local filesystem are in sync.
 
-### setup a sensible environment (part 1)
+Since you're using github, now would be as good a time as any to create some templates to help potential collaborators.  I have created issue templates for "bug_reports" and "feature_requests" as well as a pull request template.  Again, this could have been done by manually creating files in ".github" but I find working with the GitHub GUI simpler (and it lets me build upon their existing templates).
 
-In order to develop code efficiently I use some standard python tooling.
+I also created a CODE_OF_CONDUCT.md file (as per [here](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/adding-a-code-of-conduct-to-your-project)) and a CONTRIBUTING.md file (as per [here](https://github.com/nayafia/contributing-template)).
+
+Now that that's all out of the way run
+
+```
+git pull
+```
+
+to make sure that github and your local filesystem are in sync *again*.
+
+## setup a sensible environment (part 1)
+
+In order to develop code efficiently I use some standard Python tooling.
 
 ### pyenv
 
-I use pyenv to manage my Python versions.
+I use **pyenv** to manage my Python versions.
 
 To install pyenv first make sure the dependencies are installed:
+
 ```
-$ sudo apt-get install -y make build-essential libssl-dev zlib1g-dev \
+sudo apt-get install -y make build-essential libssl-dev zlib1g-dev \
 libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev \
 libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl
 ```
@@ -154,21 +162,22 @@ $ curl https://pyenv.run | bash
 ```
 
 and add the following to "~/.bashrc":
+
 ```
 export PATH="$HOME/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 ```
 
-Reload the shell and install your favorite versions of python.  Then instruct pyenv which version to use in the repository; I'm using 3.10.0 at the time of writing.
+Reload the shell and install your favorite versions of python.  Then instruct pyenv which version to use in the repository; I'm using "3.10.0" at the time of writing.
 
 `pyenv local 3.10.0`
 
 This should create a "django-singleton/.python-version" file.
 
-#### poetry
+### poetry
 
-Python package managment is hard.  There is also no one standard way of doing it.  Like most developers, I started with pip and migrated to pipenv and toyed with piptools and embraced poetry.  Poetry handles virtual environments and package dependency management as well as building and publishing code.  To install it simply run:
+Python package managment is hard.  There is also no one standard way of doing it.  Like most developers, I started with **pip** and migrated to **pipenv** and toyed with **piptools** and embraced **poetry**.  Poetry handles virtual environments and package dependency management as well as building and publishing code.  To install it simply run:
 
 ```
 curl -sSL https://install.python-poetry.org | python3 -
@@ -176,7 +185,7 @@ poetry self update
 poetry completions bash >> ~/.bash_completion
 ```
 
-Note that the resultant completions file doesn’t work in all versions of bash; multiword case statements have to be encased in quotes.
+Note that the resultant completions file doesn’t work in all versions of bash; multi-word case statements have to be encased in quotes.
 
 Next setup some config:
 
@@ -186,12 +195,14 @@ poetry config virtualenvs.in-project true`
 
 This ensures that all virtual environments will be located in the project directory in a directory called ".venv".  This is very useful for integrating your virtual environments with your IDEs as we'll see later on.
 
-From here on, when I instruct you to install a specific python package you should use poetry to be doing this.  All the installed packages will be recorded in a "pyproject.toml" file.  As you develop it is a good idea to generate a "poetry.lock" file that locks all dependencies to a specific version.  I would say that this is essential when developing a Django Project but not when developing a Django Reusable App.  Anybody that uses it will incorporate it into their own "poetry.lock" file.  And, anyway, tox will reinstall dependencies during testing.  
+From here on, when I instruct you to install a specific python package you should use poetry to be doing this.  All the installed packages will be recorded in a "pyproject.toml" file.  As you develop it is a good idea to generate a "poetry.lock" file that locks all dependencies to a specific version.  
 
-Don't forget to run `poetry install` to create your virtual environment and get the whole process started.
-#### tox
+I would say that this is essential when developing a Django Project but not when developing a Django Reusable App.  Anybody that uses it will incorporate it into their own "poetry.lock" file.  And, anyway, tox will reinstall dependencies during testing as we'll see later.  
 
-Which brings me to tox.  Tox allows me to test my app across multiple library versions.  When writing Django Resuable Apps, the main libraries you care about are Python and Django, obviously.  If this were a more complex app, I might choose to test against multiple versions of other libraries such as Django Rest Framework.
+Don't forget to run `poetry init` to create your virtual environment and get the whole process started.
+### tox
+
+**Tox** allows me to test my app across multiple library versions.  When writing Django Resuable Apps, the main libraries you care about are Python and Django, obviously.  If this were a more complex app, I might choose to test against multiple versions of other libraries such as Django Rest Framework.
 
 Installing tox with poetry is very straightforward:
 
@@ -217,25 +228,25 @@ commands =
     poetry run pytest ./example-project
 ```
 
-I will add to this file throughout this document.  And I will write more about tox in the #testing section.
+I will add to this file throughout this document.  And I will write more about tox in the testing section.
 
-#### pytest
+### pytest
 
-Django comes with its own testing framework.  And it's pretty good.  If you are content with it that's fine.  I like to have a bit more control over my test runners.  And I like the way that pytest uses fixtures.  And I've just gotten used to it over the years.  So I use pytest. 
+Django comes with its own testing framework.  And it's pretty good.  If you are content with it that's fine.  I like to have a bit more control over my test runners.  And I like the way that pytest uses fixtures.  And I've just gotten used to it over the years.  So I use **pytest**. 
 
 `poetry add --group dev pytest pytest-django factory-boy`
 
 There are several useful [pytest plugins](https://docs.pytest.org/en/7.2.x/reference/plugin_list.html) you can add if you like.
 
-I'll write more about pytest in the #testing section.
+I'll write more about pytest in the testing section.
 
-#### yapf
+### yapf
 
-I use yapf (Yet Another Python Formatter) for linting because I like my code to be pretty.  Install it like this:
+I use **yapf** (Yet Another Python Formatter) for linting because I like my code to be pretty.  Install it like this:
 
 `poetry add --group dev yapf`
 
-I _might_ revert to **black** instead of **yapf** simply because it can't be formatted and therefore it's impossible to get into arguments about what the code style should look like.  At the time of writing, though, there are just a few idiosyncracies about **black** that bug me. 
+I _might_ revert to **black** instead of **yapf** simply because it can't be configured and therefore it's impossible to get into arguments about what the code style should look like.  At the time of writing, though, there are just a few idiosyncracies about **black** that bug me. 
 
 In fact, I'm so idiosyncratic that I add my own personal style choices to yapf:
 
@@ -248,10 +259,10 @@ In fact, I'm so idiosyncratic that I add my own personal style choices to yapf:
 
 I will revisit these preferences when discussing the IDE.
 
-#### sphinx
+### sphinx
 
 
-I use sphinx for documenting my code.  This will automatically parse docstings in code:
+I use **sphinx** for documenting my code.  This will automatically parse docstings in code:
 
 ```
 class MyClass(object):
@@ -290,13 +301,13 @@ Install sphinx, and some associated packages that I like, using
 
 By default sphinx can parse ReStructuredText documents.  `myst-parser` allows it to parse MarkDown (which is not only more intuitive, it is also what GitHub wrote your README file in).  And `sphinx-rtd-theme` incorporates the standard theme used by ReadTheDocs - which is where our documentation is going to wind up (assuming this app is going to be public).
 
-### bootstrap your repository
+## bootstrap your repository
 
-Recall that we created some empty directories at the root of our repository.  We can now flesh them out with actual content.  I have created templates that can be used to help with this process.  If you don't like my teplates, then just use the standard bootstrapping tools.  If you find my templates too complex, then just copy this repository and change the bits you don't like.
+Recall that we created some empty directories at the root of our repository.  We can now flesh them out with actual content.  I have created several templates that can be used to help with this process.  If you don't like my templates, then just use the standard bootstrapping tools.  If you find my templates too complex, then just copy this repository and change the bits you don't like.
 
-#### bootstrapping the app
+### bootstrapping the app
 
-This is easy.  Just run
+This is easy.  Just run:
 
 `django-admin startapp --template=https://github.com/allynt/django-reusable-app-template/archive/master.zip singleton2` 
 
@@ -309,17 +320,17 @@ This is a pretty standard Django App with the following tweaks:
 * "conf.py" includes app-specific configuration using the **django-appconf** reusable app
 * "urls.py" includes an empty `urlpatterns` array that will be referenced by the example-project below
 
-#### boostrapping the project to develop against
+### boostrapping the project to develop against
 
-This is also easy.
+This is also easy:
 
 `django-admin startproject --template=https://github.com/allynt/django-reusable-app-project-template/archive/master.zip example example-project` 
 
-will populate the "example-project" directory.
+to populate the "example-project" directory.
 
-When developing a Resuable Django App, there are different approaches to testing and building migrations.  I've come across a lot of apps that just don't document this at all.  I've come across others that have special scripts which *fake* a Django Project (ie: just a minimal "settings.py" file to run `django.setup()` with) to load the app in order to generate migrations.  But I feel like it makes sense to use a *real* Django Project so that you can interact with your app naturally.  
+When developing a Resuable Django App, there are different approaches to testing and building migrations.  I've come across a lot of apps that just don't document this at all.  I've come across others that have special scripts which *fake* a Django Project (ie: just a minimal "settings.py" file) to run `django.setup()` with so that the app can be loaded in order to generate migrations.  But I feel like it makes sense to use a *real* Django Project so that you can interact with your app naturally.  
 
-Therefore the "example-project" that I create can be run just like any other Django Project.  It will allow me to generate migrations.  And it will allow me to run tests (located in "example-project/example/tests").  But, crucially, it will also allow me to hack about and make sure I understand exactly how the code works.
+Therefore the "example-project" that I create can be run just like any other Django Project.  It will allow me to generate migrations.  And it will allow me to run tests (located in "example-project/example/tests").  But, crucially, it will also allow me to hack about and make sure I understand exactly how the app works.
 
 I am quite partial to many of the ideas recommended by Cookiecuter Django and so this example-project uses some of their ideas.
 
@@ -327,11 +338,18 @@ I am quite partial to many of the ideas recommended by Cookiecuter Django and so
 * an app called "example" where all the code that will use the Django Resuable App goes - this includes a "tests" module 
 * some custom additions to the "settings.py" file, including the use of **django-environ** to read environment variables
 
-#### bootstrapping the documentation
+### bootstrapping the documentation
 
 As mentioned above I use sphinx for the documentation.  I have provided a template that tweaks the default documentation structure - including linking the README.md file and autogenerated documentation to the index page.  This template is available at [https://github.com/allynt/django-reusable-app-sphinx-template](https://github.com/allynt/django-reusable-app-sphinx-template).  At the time of writing, the sphinx CLI cannot use a remote template, therefore this repository must first be cloned locally and then the following command
 
 `cd docs && sphinx-quickstart --templatedir=django-reusable-app-sphinx-template/templates .` will create some initial documentation.
+
+While we're here, we might as well register the repository with readthedocs.  There is probably a way to do this on the command line, but just registering for an account at readthedocs.org and then adding the repository as a "project" and configuring it.  Having done that, it might look pretty if you add the badge to the README.md file:
+
+```
+[![Documentation Status](https://readthedocs.org/projects/django-singleton2/badge/?version=latest)](https://django-singleton2.readthedocs.io/en/latest/?badge=latest)
+```
+
 
 ### setup a sensible environment (part 2)
 
