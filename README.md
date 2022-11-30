@@ -20,18 +20,17 @@
     - [bootstrapping the app](#bootstrapping-the-app)
     - [boostrapping the project to develop against](#boostrapping-the-project-to-develop-against)
     - [bootstrapping the documentation](#bootstrapping-the-documentation)
-    - [setup a sensible environment (part 2)](#setup-a-sensible-environment-part-2)
-    - [coding](#coding)
-      - [connect the app to the example-project](#connect-the-app-to-the-example-project)
-      - [testing](#testing)
-      - [documenting](#documenting)
+  - [setup a sensible environment (part 2)](#setup-a-sensible-environment-part-2)
+  - [coding](#coding)
+    - [connect the app to the example-project](#connect-the-app-to-the-example-project)
+    - [documenting](#documenting)
+    - [testing](#testing)
       - [versioning](#versioning)
       - [packaging](#packaging)
       - [publishing](#publishing)
       - [continuous integration (workflows)](#continuous-integration-workflows)
   - [I AM HERE](#i-am-here)
       - [documentation](#documentation)
-      - [read the docs](#read-the-docs)
     - [testing](#testing-1)
       - [pytest](#pytest-1)
       - [tox](#tox-1)
@@ -344,16 +343,10 @@ As mentioned above I use sphinx for the documentation.  I have provided a templa
 
 `cd docs && sphinx-quickstart --templatedir=django-reusable-app-sphinx-template/templates .` will create some initial documentation.
 
-While we're here, we might as well register the repository with readthedocs.  There is probably a way to do this on the command line, but just registering for an account at readthedocs.org and then adding the repository as a "project" and configuring it.  Having done that, it might look pretty if you add the badge to the README.md file:
+You can add any additional documentation files you want within the "doc" directory.  Just make sure to include a reference to it underneath the `:toc` directive in "index.rst".  
+## setup a sensible environment (part 2)
 
-```
-[![Documentation Status](https://readthedocs.org/projects/django-singleton2/badge/?version=latest)](https://django-singleton2.readthedocs.io/en/latest/?badge=latest)
-```
-
-
-### setup a sensible environment (part 2)
-
-An IDE makes life a lot easier.  I use **VSCode**.  I have therefore included a ".vscode/settings.json" file (and a generic ".editorconfig" file) to configure a few nice features.  My configuration includes a path to the virtual environment created by poetry: ".venv" in order to do code-completion as well as linting.  I also specify the custom style arguments to **yapf** mentioned earlier.
+An IDE makes life a lot easier.  I use **VSCode**.  I have therefore included a ".vscode/settings.json" file (and a generic ".editorconfig" file) to configure a few nice features.  My configuration includes a path to the virtual environment created by poetry (".venv") in order to do code-completion as well as linting.  I also specify the custom style arguments to **yapf** mentioned earlier.
 
 In theory, keeping these files with the repository not only makes it easier for *me* to code, it makes it less likely for *you* to push code that conflicts with my style.
 
@@ -370,11 +363,11 @@ I also some particularly useful VSCode plugins installed:
 
 *Actually, I use a few more plugins for full-stack development, but these are the ones that are relevant for creating Django Resuable Apps.*
 
-### coding
+## coding
 
-So that is most of the setup required before diving into actual coding.  There are a few other things that are needed to actually run, test, document, publish, etc. the code.
+So that is most of the setup required before finally diving into actual coding.  There are a few other things that are needed to actually run, test, document, publish, etc. the code.
 
-#### connect the app to the example-project
+### connect the app to the example-project
 
 Obviously, we need to tell **example-project** about **django-singleton2**.  This is very straightforward, just add the following to "example-project/config/settings.py":
 
@@ -385,7 +378,7 @@ LOCAL_APPS = [
 ]
 ```
 
-If your app is more complex then there will probably be some additional configuration needed, such as adding your views to "example-project/config/urls.py".
+If your app is more complex then there will probably be some additional configuration needed, such as adding your views to "example-project/config/urls.py", etc.
 
 You also need to make sure that all of your app's dependencies are installed:
 
@@ -393,10 +386,104 @@ You also need to make sure that all of your app's dependencies are installed:
 
 Now try running `poetry run ./example-project/manage.py runserver` and see if something appears at "localhost:8000".  If not, you messed up.
 
-#### testing
+### documenting
 
-As mentio
-#### documenting
+I have already discussed using **sphinx** to automatically generate some nice documentation.  I am going to host my documentation on readthedocs because I deserve it.    This requires registering the repository with readthedocs.  There is probably a way to do this on the command line, but I just signed up for an account on readthedocs.org and then manaually used their GUI to import this repostiroy.  
+
+Having done that, it might look pretty if you add the badge to the README.md file:
+
+```
+[![Documentation Status](https://readthedocs.org/projects/django-singleton2/badge/?version=latest)](https://django-singleton2.readthedocs.io/en/latest/?badge=latest)
+```
+
+Originally, I added some commands to the "tox.ini" file in order to do clever things with documentation (bypassing the handy Makefile generated by `sphinx-quickstart`).  This got rather complicted and had me wondering what the point was since `sphinx-quickstart` had already automatically generated a handy Makefile for just that purpose.  
+
+So I added the following command instead:
+
+```
+[testenv:docs]
+deps = 
+    sphinx
+    sphinx-rtd-theme
+    myst-parser
+changedir = docs
+commands = 
+    make clean
+    make html SPHINXOPTS="-v"
+```
+
+I had to create a ".readthedocs.yml" file which points to "docs/requirements.txt" in order to specify exactly what dependencies are required to run the code (since it needs to be loaded for auto-generated documentation).  Although readthedocs *can* parse the "pyproject.toml" file, it ignores grouped dependencies.  So to populate "docs/requirements.txt" I ran `poetry export -f requirments.txt --only docs --output docs/requirements.txt`.
+
+Having done all of this will result in https://django-singleton2.readthedocs.io being auto-generated whenever the master branch is pushed to.
+
+If you want additional auto-generated code documentation, just modify "docs/singleton2.rst" to specify which modules / classes / methods should be included.
+### testing
+
+As mentioned earlier, I use **pytest** as my test runner and **tox** to coordinate testing across multiple environments.  This all requires a bit more config.  First make sure **pytest-django** and **factory-boy** are installed.  These make pytest work a bit nicer w/ Django.  The general syntax I use for a test is:
+
+
+```
+import factory
+import pytest
+
+from example.models import ExampleSingletonModel
+
+class ExampleSingletonModelFactory(factory.django.DjangoModelFactory):
+    """
+    creates an instance of ExampleSingletonModel w/ random field values to use in tests
+    """
+    class Meta:
+        model = ExampleSingletonModel
+
+    name = factory.Faker("word")
+
+@pytest.mark.django_db
+class TestSingleton:
+    """
+    collection of test methods that hit the Django database
+    """
+    def test_something(self):
+        singleton = ExampleSingletonModelFactory()
+        assert singleton_1.pk is not None
+```
+
+Using pytest requires a "pytest.ini" file w/ the following minimal content:
+
+```
+[pytest]
+DJANGO_SETTINGS_MODULE=config.settings
+python_files = tests.py test_*.py *_tests.py
+addopts = --nomigrations
+```
+
+This tells pytest how to start Django and which files to run. (It also instructs it not to bother running any unmigrated migrations.)
+
+To run the tests simply run the following command:
+
+```
+poetry run pytest ./example-project
+```
+
+If you like you can add a test-coverage report using the **pytest-cov** library.  I am undecided as to whether this is a good idea.  I feel like using it as a measure of test quality gives a false sence of security.  And, anyway, aiming for 100% coverage is unrealistic.  What is important is testing the *relevant* bits of code under *realistic* use-cases.
+
+
+To run a coverage report simply run the following command:
+
+```
+poetry run pytest --cov=singleton2 ./example-project
+```
+
+This will measure the coverage of all code under "singleton2" (it focuses on the app and excludes the example-project).  Some of the modules within "singleton2" don't really need to be included in a coverage report.  Therefore we can add the following section to "tox.ini"
+
+
+configuration file ".coveragerc":
+
+```
+[run]
+omit = singleton2/migrations/*, singleton2/tests/*
+```
+
+
 
 #### versioning
 
@@ -425,31 +512,6 @@ TODO:
 
 
 #### documentation
-
-In a
-#### read the docs
-
-Next I want to see my documentation on readthedocs because I deserve it.  This requires signing up for an account on readthedocs.org via github.  
-
-Then import your github project.  For some strange reason, readthedocs didn't recognise my repository and so I had to import it manually.  There is a very helpful GUI that walks you through the process.
-
-In hindesight, using tox to build documentation is probably a bad idea b/c it pollutes the venvs w/ unused dependencies and I'm not really using it anyway since the integration between github and readthedocs will build it for me.
-
-So, I'm just going to run `poetry shell && make html` in the docs directory whenever I want to see documentation locally.  And use a ".readthedocs.yml" to make sure that all my dependencies (such as django) are installed when readthedocs uses sphinx to build documentation.
-
-So, readthedocs *can* parse the "pyproject.toml" file, but only top-level dependencies.  I therefore added some explicit dependencies for documenation using the "docs" dependency group: `poetry export -f requirments.txt --only docs --output docs/requirements.txt` and referenced it in the ".readthedocs.yml" like this:
-
-
-```
-python:
-  install:
-    - method: pip
-      path: .
-      extra_requirements:
-        - docs/requirements.txt
-```
-
-I don't understand it either.
 
 
 
