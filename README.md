@@ -8,13 +8,14 @@
   - [Configuration](#configuration)
   - [Usage](#usage)
 - [The process of creating the app](#the-process-of-creating-the-app)
+  - [Operating System](#operating-system)
   - [Project Structure](#project-structure)
   - [setup a sensible environment (part 1)](#setup-a-sensible-environment-part-1)
     - [pyenv](#pyenv)
     - [poetry](#poetry)
     - [tox](#tox)
     - [pytest](#pytest)
-    - [yapf](#yapf)
+    - [black](#black)
     - [sphinx](#sphinx)
   - [bootstrap your repository](#bootstrap-your-repository)
     - [bootstrapping the app](#bootstrapping-the-app)
@@ -30,8 +31,6 @@
     - [publishing](#publishing)
   - [continuous integration (workflows)](#continuous-integration-workflows)
 - [I AM HERE](#i-am-here)
-    - [testing](#testing-1)
-      - [pytest](#pytest-1)
       - [tox](#tox-1)
       - [github actions](#github-actions)
     - [publish](#publish)
@@ -94,13 +93,17 @@ If you try to save more than one instance of a singleton outside of a form then 
 
 All the stuff that other people seem to already know is described here.
 
-I do all of my coding on Ubuntu because I'm not insane.  
+## Operating System
+
+I do all of my coding on Linux because I'm not insane.  I use Xubuntu because Ubuntu is pretty standard, but I'm used to having lousy hardware and XFCE takes less processing power than Unity.  Plus, I'm used to it.
+
+These days, a lot of development is done in Docker.  So the underlying OS doesn't really matter.  Still, if I can avoid virutalization I will.  This Django Reusable App does not rely on Docker for development purposes.
 
 ## Project Structure
 
-First create the repository in GiHub.  In theory this can be done from the command line using [gh]([https://cli.github.com/), but honestly, I find using the GitHub website GUI a lot more straightforward.  Plus doing it this way can automatically create the "README.md", "LICENCE", and ".gitignore" files for you.  
+First create the repository in GiHub.  In theory this can be done from the command line using [gh]([https://cli.github.com/), but honestly, I find using the GitHub website GUI a lot more straightforward.  Plus doing it this way can automatically create the "README.md" and "LICENCE" files for you.  
 
-Once that has been done, clone the repository into your local filesystem and then setup the basic directory structure:
+Once that has been done, clone this repository into your local filesystem and then setup the basic directory structure:
 
 ```
 git clone git@github.com:allynt/django-singleton2.git django-singleton
@@ -112,6 +115,27 @@ cd django-singleton/
 ```
 
 This provides us with a place to store the app, an example project to develop against, documentation, and workflows for CI.
+
+Note that the repository already comes with a ".gitingore" file.  This has been generated from [gitignore.io](https://www.toptal.com/developers/gitignore/api/django,linux,python) with a few extra bits tacked onto the end:
+
+```
+# static & media files
+example-project/_static/*
+example-project/_media/*
+
+# pytest output
+example-project/pytest-report.html
+example-project/output.json
+example-project/archive
+
+# local environment variables
+.env.*
+
+# in progress files
+*.bak
+*.orig
+```
+You should override this according to your needs.
 
 Now that that's all out of the way run
 
@@ -168,11 +192,11 @@ Reload the shell and install your favorite versions of python.  Then instruct py
 
 `pyenv local 3.10.0`
 
-This should create a "django-singleton/.python-version" file.
+This should create a "django-singleton2/.python-version" file.
 
 ### poetry
 
-Python package managment is hard.  There is also no one standard way of doing it.  Like most developers, I started with **pip** and migrated to **pipenv** and toyed with **piptools** and embraced **poetry**.  Poetry handles virtual environments and package dependency management as well as building and publishing code.  To install it simply run:
+Python package management is hard.  There is also no one standard way of doing it.  Like most developers, I started with **pip** and migrated to **pipenv** and toyed with **piptools** and embraced **poetry** and am intrigued by **pdm** (but dissappointed that [PEP582](https://peps.python.org/pep-0582/) was not endorsed - that would have made working w/ code inside _and_ outside Docker containers much easier).  Poetry handles virtual environments and package dependency management as well as building and publishing code.  To install it simply run:
 
 ```
 curl -sSL https://install.python-poetry.org | python3 -
@@ -229,35 +253,24 @@ I will add to this file throughout this document.  And I will write more about t
 
 Django comes with its own testing framework.  And it's pretty good.  If you are content with it that's fine.  I like to have a bit more control over my test runners.  And I like the way that pytest uses fixtures.  And I've just gotten used to it over the years.  So I use **pytest**. 
 
-`poetry add --group dev pytest pytest-django factory-boy`
+`poetry add --group dev pytest pytest-django pytest-html-reporter factory-boy`
 
 There are several useful [pytest plugins](https://docs.pytest.org/en/7.2.x/reference/plugin_list.html) you can add if you like.
 
 I'll write more about pytest in the testing section.
 
-### yapf
+### black
 
-I use **yapf** (Yet Another Python Formatter) for linting because I like my code to be pretty.  Install it like this:
+I use **black** for linting because I like my code to be pretty.  Install it like this:
 
-`poetry add --group dev yapf`
+`poetry add --group dev black`
 
-I _might_ revert to **black** instead of **yapf** simply because it can't be configured and therefore it's impossible to get into arguments about what the code style should look like.  At the time of writing, though, there are just a few idiosyncracies about **black** that bug me. 
-
-In fact, I'm so idiosyncratic that I add my own personal style choices to yapf:
-
-```
-{
-  "dedent_closing_brackets": 1,
-  "split_all_top_level_comma_separated_values": 1,
-}
-```
-
-I will revisit these preferences when discussing the IDE.
+I have usually used **yapf** (Yet Another Python Formatter) because it can be configured and there are just a few personal stylistic idiosynchrasies that bug me.  But when writing a Django Reusable App where other developers might contribute, I concede that it makes sense to use something that can't be configured and therefore makes it impossible to get into arguments about coding style.  Hence, **black**.
 
 ### sphinx
 
 
-I use **sphinx** for documenting my code.  This will automatically parse docstings in code:
+I use **sphinx** for documenting my code.  This will automatically parse docstings in code as follows::
 
 ```
 class MyClass(object):
@@ -342,13 +355,13 @@ As mentioned above I use sphinx for the documentation.  I have provided a templa
 You can add any additional documentation files you want within the "doc" directory.  Just make sure to include a reference to it underneath the `:toc` directive in "index.rst".  
 ## setup a sensible environment (part 2)
 
-An IDE makes life a lot easier.  I use **VSCode**.  I have therefore included a ".vscode/settings.json" file (and a generic ".editorconfig" file) to configure a few nice features.  My configuration includes a path to the virtual environment created by poetry (".venv") in order to do code-completion as well as linting.  I also specify the custom style arguments to **yapf** mentioned earlier.
+An IDE makes life a lot easier.  I use **VSCode**.  I have therefore included a ".vscode/settings.json" file (and a generic ".editorconfig" file) to configure a few nice features.  My configuration includes a path to the virtual environment created by poetry (".venv") in order to do code-completion as well as linting. 
 
 In theory, keeping these files with the repository not only makes it easier for *me* to code, it makes it less likely for *you* to push code that conflicts with my style.
 
 > *TODO* Although, I may also add a github action to automatically lint all incoming code.
 
-I also some particularly useful VSCode plugins installed:
+I also have some particularly useful VSCode plugins installed:
 * MS Python (this will install loads of other useful plugins)
 * Markdown all in one
 * Better comments
@@ -384,9 +397,9 @@ Now try running `poetry run ./example-project/manage.py runserver` and see if so
 
 ### documenting
 
-I have already discussed using **sphinx** to automatically generate some nice documentation.  I am going to host my documentation on readthedocs because I deserve it.    This requires registering the repository with readthedocs.  There is probably a way to do this on the command line, but I just signed up for an account on readthedocs.org and then manaually used their GUI to import this repostiroy.  
+I have already discussed using **sphinx** to automatically generate some nice documentation.  I am going to host my documentation on readthedocs because I deserve it.  This requires registering the repository with readthedocs.  There is probably a way to do this on the command line, but I just signed up for an account on readthedocs.org and then manaually used their GUI to import this repostiroy.  
 
-Having done that, it might look pretty if you add the badge to the README.md file:
+Having done that, it might look pretty if you add their badge to the README.md file:
 
 ```
 [![Documentation Status](https://readthedocs.org/projects/django-singleton2/badge/?version=latest)](https://django-singleton2.readthedocs.io/en/latest/?badge=latest)
@@ -408,7 +421,7 @@ commands =
     make html SPHINXOPTS="-v"
 ```
 
-In order for this to work I had to create a ".readthedocs.yml" file which points to "docs/requirements.txt" in order to specify exactly what dependencies are required to run the code (since it needs to be loaded for auto-generated documentation).  Although readthedocs *can* parse the "pyproject.toml" file, it ignores grouped dependencies.  So to populate "docs/requirements.txt" I ran `poetry export -f requirments.txt --only docs --output docs/requirements.txt`.
+In order for this to work I had to create a ".readthedocs.yml" file which points to "docs/requirements.txt" in order to specify exactly what dependencies are required to run the codebase (since it needs to be loaded for auto-generated documentation).  Although readthedocs *can* parse the "pyproject.toml" file, it ignores grouped dependencies.  So to populate "docs/requirements.txt" I ran `poetry export -f requirments.txt --only docs --output docs/requirements.txt`.
 
 Having done all of this will result in https://django-singleton2.readthedocs.io being auto-generated whenever the master branch is pushed to.
 
@@ -417,6 +430,7 @@ If you want additional auto-generated code documentation, just modify "docs/sing
 
 As mentioned earlier, I use **pytest** as my test runner and **tox** to coordinate testing across multiple environments.  This all requires a bit more config.  First make sure **pytest-django** and **factory-boy** are installed.  These make pytest work a bit nicer w/ Django.  The general syntax I use for a test is:
 
+> *TODO* Add test artefacts from pytest-html-reporter
 
 ```
 import factory
@@ -489,8 +503,6 @@ configuration file ".coveragerc":
 omit = singleton2/migrations/*, singleton2/tests/*
 ```
 
-
-
 ### versioning
 
 ### packaging
@@ -516,14 +528,6 @@ TODO:
 * dynamic versioning: https://github.com/mtkennerly/poetry-dynamic-versioning
 * badges
 
-
-
-### testing
-
-there are loads of ways to tweak pytest, I happen to be using pytest-django 
-https://docs.pytest.org/en/7.2.x/reference/plugin_list.html
-
-#### pytest 
 
 #### tox
 

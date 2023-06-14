@@ -15,11 +15,8 @@
     ".venv/",
   ],
   "python.defaultInterpreterPath": ".venv/bin/python",
-  "python.formatting.provider": "yapf",
-  "python.formatting.yapfArgs": [
-    "--style={dedent_closing_brackets: 1, split_all_top_level_comma_separated_values: 1}"
-  ],
-  "python.formatting.yapfPath": ".venv/bin/yapf",
+  "python.formatting.provider": "black",
+  "python.formatting.blackPath": ".venv/bin/black",
   "python.linting.enabled": true,
   "python.linting.lintOnSave": true,
   "python.terminal.activateEnvironment": false,

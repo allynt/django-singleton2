@@ -16,13 +16,16 @@ django-environ = "^0.9.0"
 tox = "*"
 pytest = "*"
 pytest-django = "*"
+pytest-cov = "*"
+pytest-html-reporter = "*"
 factory-boy = "*"
-yapf = "*"
+black = "*"
 
 [tool.poetry.group.docs.dependencies]
 sphinx = "*"
 sphinx-rtd-theme = "*"
 myst-parser = "*"
+
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
